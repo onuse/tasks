@@ -344,12 +344,128 @@ const htmlTemplate = `<!DOCTYPE html>
             text-align: center;
             padding: 20px;
         }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .view-btn:hover {
+            border-color: #2196F3;
+        }
+
+        .list-view {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .list-task {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .list-task:hover {
+            background: #f9f9f9;
+        }
+
+        .list-task:last-child {
+            border-bottom: none;
+        }
+
+        .list-task-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .list-task-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .list-task-status.backlog { background: #9e9e9e; color: white; }
+        .list-task-status.active { background: #2196F3; color: white; }
+        .list-task-status.blocked { background: #ff9800; color: white; }
+        .list-task-status.done { background: #4caf50; color: white; }
+        .list-task-status.cancelled { background: #f44336; color: white; }
+
+        .list-task-id {
+            font-size: 12px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .list-task-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+
+        .list-task-date {
+            font-size: 12px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📋 Task Manager</h1>
+
+        <div class="controls">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search tasks..." onkeyup="filterTasks()">
+            <div class="view-toggle">
+                <button class="view-btn active" id="boardViewBtn" onclick="setView('board')">Board</button>
+                <button class="view-btn" id="listViewBtn" onclick="setView('list')">List</button>
+            </div>
+        </div>
+
         <div class="board" id="board"></div>
+        <div class="list-view" id="listView" style="display: none;"></div>
     </div>
 
     <button class="refresh-btn" onclick="loadTasks()">🔄 Refresh</button>
@@ -363,14 +479,53 @@ const htmlTemplate = `<!DOCTYPE html>
 
     <script>
         let tasks = [];
+        let filteredTasks = [];
+        let currentView = 'board';
 
         async function loadTasks() {
             try {
                 const response = await fetch('/api/tasks');
                 tasks = await response.json();
-                renderBoard();
+                filterTasks();
             } catch (error) {
                 console.error('Failed to load tasks:', error);
+            }
+        }
+
+        function filterTasks() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            if (searchTerm === '') {
+                filteredTasks = tasks;
+            } else {
+                filteredTasks = tasks.filter(task =>
+                    task.title.toLowerCase().includes(searchTerm) ||
+                    task.id.toString().includes(searchTerm)
+                );
+            }
+
+            if (currentView === 'board') {
+                renderBoard();
+            } else {
+                renderList();
+            }
+        }
+
+        function setView(view) {
+            currentView = view;
+
+            if (view === 'board') {
+                document.getElementById('board').style.display = 'flex';
+                document.getElementById('listView').style.display = 'none';
+                document.getElementById('boardViewBtn').classList.add('active');
+                document.getElementById('listViewBtn').classList.remove('active');
+                renderBoard();
+            } else {
+                document.getElementById('board').style.display = 'none';
+                document.getElementById('listView').style.display = 'block';
+                document.getElementById('boardViewBtn').classList.remove('active');
+                document.getElementById('listViewBtn').classList.add('active');
+                renderList();
             }
         }
 
@@ -393,7 +548,7 @@ const htmlTemplate = `<!DOCTYPE html>
 
                 const header = document.createElement('div');
                 header.className = 'column-header';
-                const statusTasks = tasks.filter(t => t.status === status);
+                const statusTasks = filteredTasks.filter(t => t.status === status);
                 header.textContent = statusNames[status] + ' (' + statusTasks.length + ')';
                 column.appendChild(header);
 
@@ -515,6 +670,52 @@ const htmlTemplate = `<!DOCTYPE html>
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function renderList() {
+            const listView = document.getElementById('listView');
+            listView.innerHTML = '';
+
+            if (filteredTasks.length === 0) {
+                listView.innerHTML = '<div class="empty-column">No tasks found</div>';
+                return;
+            }
+
+            // Sort by ID descending (newest first)
+            const sortedTasks = [...filteredTasks].sort((a, b) => b.id - a.id);
+
+            sortedTasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'list-task';
+                taskDiv.onclick = () => showTask(task.id);
+
+                const header = document.createElement('div');
+                header.className = 'list-task-header';
+
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'list-task-status ' + task.status;
+                statusSpan.textContent = task.status;
+
+                const idSpan = document.createElement('span');
+                idSpan.className = 'list-task-id';
+                idSpan.textContent = '#' + task.id;
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'list-task-title';
+                titleSpan.textContent = task.title;
+
+                const dateSpan = document.createElement('span');
+                dateSpan.className = 'list-task-date';
+                dateSpan.textContent = formatDate(task.updated);
+
+                header.appendChild(statusSpan);
+                header.appendChild(idSpan);
+                header.appendChild(titleSpan);
+                header.appendChild(dateSpan);
+
+                taskDiv.appendChild(header);
+                listView.appendChild(taskDiv);
+            });
         }
 
         // Close modal when clicking outside

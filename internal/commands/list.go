@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/onuse/tasks/internal/store"
 	"github.com/onuse/tasks/internal/task"
@@ -13,14 +14,16 @@ import (
 func List(args []string) error {
 	// Parse flags
 	fs := flag.NewFlagSet("list", flag.ExitOnError)
-	statusFlag := fs.String("status", "active", "Filter by status (backlog, active, done, cancelled, all)")
+	statusFlag := fs.String("status", "active", "Filter by status (backlog, active, blocked, done, cancelled, all)")
 	formatFlag := fs.String("format", "text", "Output format (text, json, compact)")
+	sortFlag := fs.String("sort", "id", "Sort by: id, created, updated, title, status")
+	reverseFlag := fs.Bool("reverse", false, "Reverse sort order")
 	fs.Parse(args)
 
 	// Validate status
 	filterStatus := *statusFlag
 	if filterStatus != "all" && !task.IsValidStatus(filterStatus) {
-		return fmt.Errorf("invalid status '%s' (must be: backlog, active, done, cancelled, all)", filterStatus)
+		return fmt.Errorf("invalid status '%s' (must be: backlog, active, blocked, done, cancelled, all)", filterStatus)
 	}
 
 	// Find task root
@@ -47,6 +50,9 @@ func List(args []string) error {
 		}
 	}
 
+	// Sort tasks
+	sortTasks(filtered, *sortFlag, *reverseFlag)
+
 	// Output
 	switch *formatFlag {
 	case "json":
@@ -55,6 +61,46 @@ func List(args []string) error {
 		return outputCompact(filtered)
 	default:
 		return outputText(filtered)
+	}
+}
+
+func sortTasks(tasks []task.IndexEntry, sortBy string, reverse bool) {
+	switch sortBy {
+	case "created":
+		sort.Slice(tasks, func(i, j int) bool {
+			if reverse {
+				return tasks[i].Created.After(tasks[j].Created)
+			}
+			return tasks[i].Created.Before(tasks[j].Created)
+		})
+	case "updated":
+		sort.Slice(tasks, func(i, j int) bool {
+			if reverse {
+				return tasks[i].Updated.After(tasks[j].Updated)
+			}
+			return tasks[i].Updated.Before(tasks[j].Updated)
+		})
+	case "title":
+		sort.Slice(tasks, func(i, j int) bool {
+			if reverse {
+				return tasks[i].Title > tasks[j].Title
+			}
+			return tasks[i].Title < tasks[j].Title
+		})
+	case "status":
+		sort.Slice(tasks, func(i, j int) bool {
+			if reverse {
+				return tasks[i].Status > tasks[j].Status
+			}
+			return tasks[i].Status < tasks[j].Status
+		})
+	default: // "id"
+		sort.Slice(tasks, func(i, j int) bool {
+			if reverse {
+				return tasks[i].ID > tasks[j].ID
+			}
+			return tasks[i].ID < tasks[j].ID
+		})
 	}
 }
 

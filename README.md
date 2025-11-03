@@ -9,6 +9,10 @@ A fast, local-first task management CLI optimized for LLM-driven development. Bu
 - **LLM-native**: Designed for how LLMs work and think
 - **Simple**: Single binary, no dependencies, works everywhere
 - **Git-friendly**: One file per task minimizes merge conflicts
+- **Task Relationships**: Link tasks with flexible relationship types (blocks, parent/child, etc.)
+- **Full-text Search**: Search across titles, descriptions, notes, and tags
+- **Web UI**: Beautiful Kanban board with real-time updates
+- **Flexible**: No artificial constraints - all status transitions allowed
 
 ## Installation
 
@@ -51,7 +55,15 @@ task list --status all
 
 # List by status
 task list --status backlog
+task list --status blocked
 task list --status done
+
+# Sort tasks
+task list --status all --sort updated --reverse  # Newest first
+task list --status all --sort title              # Alphabetical
+task list --status all --sort id --reverse       # By ID descending
+
+# Available sorts: id, created, updated, title, status
 ```
 
 ### Update Tasks
@@ -77,6 +89,56 @@ task update 1 --status active --note "Working on this now"
 ```bash
 task show 1
 ```
+
+### Link Tasks
+
+```bash
+# Create a link between tasks
+task link 5 4 --type blocked_by  # Task 5 is blocked by task 4
+
+# With a custom label
+task link 2 3 --type parent --label "Main feature"
+
+# Create reciprocal links automatically
+task link 5 4 --type blocked_by --bidirectional
+# Creates: 5 blocked_by 4, and 4 blocks 5
+
+# Remove a link
+task unlink 2 3 --type blocks
+
+# Link types: blocks, blocked_by, parent, child, relates_to, duplicates
+```
+
+### Search Tasks
+
+```bash
+# Search by keyword (searches title, description, notes, tags)
+task search "authentication"
+
+# With different output formats
+task search "bug" --format json
+task search "refactor" --format compact
+```
+
+### Web UI
+
+```bash
+# Start the web interface
+task serve
+
+# Custom port
+task serve --port 3000
+
+# Don't auto-open browser
+task serve --no-browser
+```
+
+Features:
+- Kanban board view with all 5 statuses
+- List view for quick scanning
+- Real-time search and filtering
+- Click tasks to see full details
+- Auto-refresh every 5 seconds
 
 ### Get Project Context
 
@@ -104,8 +166,11 @@ task context --format json
 
 - `backlog` - Not started (default for new tasks)
 - `active` - Currently being worked on
+- `blocked` - Waiting on dependencies or external factors
 - `done` - Completed
 - `cancelled` - Won't do
+
+All status transitions are allowed - you can move tasks between any statuses freely.
 
 ## Output Formats
 
@@ -182,90 +247,3 @@ When completing:
 ```bash
 task update <id> --status done
 ```
-
-### Principles
-- Use tasks instead of TODO comments in code
-- Use tasks instead of creating TODO.md files
-- Break large work into multiple tasks
-- Keep task titles short and actionable
-- Add notes as you make progress
-```
-
-## Error Handling
-
-Exit codes:
-- `0` - Success
-- `1` - Generic error (task not found, invalid input)
-- `2` - File system error
-- `3` - Not in a task-enabled repository
-
-## Performance
-
-Tested on modern hardware with 1000+ tasks:
-- `task list`: <5ms
-- `task create`: <5ms
-- `task show`: <3ms
-- `task update`: <5ms
-- `task context`: <5ms
-
-## Development
-
-### Building
-
-```bash
-go build -o task
-```
-
-### Running Tests
-
-```bash
-go test ./...
-```
-
-### Project Structure
-
-```
-tasks/
-  main.go                 # CLI entry point
-  internal/
-    task/
-      task.go            # Data structures
-    store/
-      store.go           # File I/O operations
-    commands/
-      init.go            # Command implementations
-      create.go
-      list.go
-      show.go
-      update.go
-      context.go
-```
-
-## Philosophy
-
-Do one thing well. Be the Git of task tracking for LLM workflows.
-
-**This tool does NOT:**
-- Sync across machines (use git)
-- Support teams/permissions (it's local files)
-- Integrate with Jira/Linear/etc
-- Have a mobile app
-- Track time automatically
-- Support plugins
-- Require configuration files
-
-## License
-
-MIT
-
-## Contributing
-
-Contributions welcome! Please open an issue or pull request.
-
-## Roadmap
-
-- [ ] Web UI (`task serve`)
-- [ ] Full-text search
-- [ ] Dependency tracking
-- [ ] Export formats (CSV, Markdown)
-- [ ] Git hooks integration
