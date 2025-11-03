@@ -33,6 +33,12 @@ func main() {
 		err = commands.Link(args)
 	case "unlink":
 		err = commands.Unlink(args)
+	case "tag":
+		err = commands.Tag(args)
+	case "untag":
+		err = commands.Untag(args)
+	case "merge":
+		err = commands.Merge(args)
 	case "search":
 		err = commands.Search(args)
 	case "context":
@@ -61,6 +67,9 @@ func printUsage() {
 	fmt.Println("  update <id> [options]          Update a task")
 	fmt.Println("  link <id> <target> [options]   Link two tasks together")
 	fmt.Println("  unlink <id> <target> [options] Remove link between tasks")
+	fmt.Println("  tag <id> <name>                Tag a task (creates label if needed)")
+	fmt.Println("  untag <id> <name>              Remove a tag from a task")
+	fmt.Println("  merge <source> <target>        Merge source task into target")
 	fmt.Println("  search <query> [options]       Search tasks by keyword")
 	fmt.Println("  context                        Show project context for LLMs")
 	fmt.Println("  serve [--port PORT]            Start web UI server")

@@ -91,7 +91,7 @@ task update 1 --status active --note "Working on this now"
 task show 1
 ```
 
-### Link Tasks
+### Link and Tag Tasks
 
 ```bash
 # Create a link between tasks
@@ -108,6 +108,17 @@ task link 5 4 --type blocked_by --bidirectional
 task unlink 2 3 --type blocks
 
 # Link types: blocks, blocked_by, parent, child, relates_to, duplicates
+
+# Tag tasks (creates label task automatically)
+task tag 42 security
+task tag 43 security
+task tag 44 frontend
+
+# Remove tags
+task untag 42 security
+
+# Merge duplicate labels
+task merge 101 100  # Merges task 101 into 100
 ```
 
 ### Search Tasks
@@ -171,10 +182,13 @@ task context --format json
 - `blocked` - Waiting on dependencies or external factors
 - `done` - Completed
 - `cancelled` - Won't do
+- `label` - Organizational/grouping task (used for tags and categories)
 
 All status transitions are allowed - you can move tasks between any statuses freely.
 
 The typical workflow is: `backlog` → `next` → `active` → `done`
+
+Label tasks are permanent organizational concepts that can be tagged onto other tasks. They can transition to `done` (when a theme completes) or `cancelled` (when deprecated).
 
 ## Output Formats
 

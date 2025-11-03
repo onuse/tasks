@@ -1,7 +1,7 @@
 {
   "id": 4,
   "created": "2025-11-03T13:18:02.1502183+01:00",
-  "updated": "2025-11-03T13:18:08.1933306+01:00",
+  "updated": "2025-11-03T18:16:41.1625944+01:00",
   "status": "backlog",
   "title": "Foundation task",
   "description": "Must complete first",
@@ -10,6 +10,10 @@
     {
       "target_id": 5,
       "type": "blocks"
+    },
+    {
+      "target_id": 8,
+      "type": "child"
     }
   ],
   "dependencies": [],

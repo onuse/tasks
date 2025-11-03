@@ -14,11 +14,12 @@ const (
 	StatusBlocked   Status = "blocked"
 	StatusDone      Status = "done"
 	StatusCancelled Status = "cancelled"
+	StatusLabel     Status = "label"
 )
 
 // ValidStatuses returns all valid status values
 func ValidStatuses() []Status {
-	return []Status{StatusBacklog, StatusNext, StatusActive, StatusBlocked, StatusDone, StatusCancelled}
+	return []Status{StatusBacklog, StatusNext, StatusActive, StatusBlocked, StatusDone, StatusCancelled, StatusLabel}
 }
 
 // IsValidStatus checks if a status string is valid

@@ -209,6 +209,7 @@ const htmlTemplate = `<!DOCTYPE html>
         .status-blocked { border-left: 4px solid #ff9800; }
         .status-done { border-left: 4px solid #4caf50; }
         .status-cancelled { border-left: 4px solid #f44336; }
+        .status-label { border-left: 4px solid #9C27B0; }
 
         .modal {
             display: none;
@@ -434,6 +435,7 @@ const htmlTemplate = `<!DOCTYPE html>
         .list-task-status.blocked { background: #ff9800; color: white; }
         .list-task-status.done { background: #4caf50; color: white; }
         .list-task-status.cancelled { background: #f44336; color: white; }
+        .list-task-status.label { background: #9C27B0; color: white; }
 
         .list-task-id {
             font-size: 12px;

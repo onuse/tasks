@@ -13,6 +13,9 @@ Complete command-line interface documentation for the task management tool.
   - [update](#update)
   - [link](#link)
   - [unlink](#unlink)
+  - [tag](#tag)
+  - [untag](#untag)
+  - [merge](#merge)
   - [search](#search)
   - [context](#context)
   - [serve](#serve)
@@ -101,7 +104,7 @@ task list [--status STATUS] [--sort FIELD] [--reverse] [--format FORMAT]
 
 **Options:**
 - `--status` - Filter by status (default: `active`)
-  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`, `all`
+  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`, `label`, `all`
 - `--sort` - Sort tasks by field (default: `id`)
   - Values: `id`, `created`, `updated`, `title`, `status`
 - `--reverse` - Reverse sort order
@@ -205,7 +208,7 @@ task update <id> [--status STATUS] [--title TITLE] [--description DESC] [--note 
 
 **Options:**
 - `--status` - Change task status
-  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`
+  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`, `label`
 - `--title` - Update task title
 - `--description` - Update task description
 - `--note` - Add a timestamped note
@@ -332,6 +335,136 @@ task unlink 5 4 --type blocked_by --bidirectional
 Removed link (blocked_by) from task #5 to #4
 Removed reciprocal link (blocks) from task #4 to #5
 ```
+
+---
+
+### tag
+
+Tag a task with a label.
+
+**Usage:**
+```bash
+task tag <id> <tag_name>
+```
+
+**Arguments:**
+- `id` (required) - Task ID to tag
+- `tag_name` (required) - Name of the tag/label
+
+**Description:**
+Tags a task by linking it to a label task. If a label task with the given name doesn't exist (case-insensitive), it will be created automatically with status `label`. Tags are implemented as links to label tasks, making them fully structured and allowing them to have their own lifecycle (active, done, cancelled).
+
+**Examples:**
+```bash
+# Tag a task
+task tag 42 security
+
+# Tag multiple tasks with the same label
+task tag 42 security
+task tag 43 security
+task tag 44 security
+
+# Labels are case-insensitive (reuses existing)
+task tag 45 Security  # Reuses "security" label
+
+# View all security tasks
+task list --status label  # Find the label task ID
+task show 100  # Shows all tasks linked to this label
+```
+
+**Output:**
+```
+Tagged task #42 with 'security' (label task #100)
+```
+
+**Notes:**
+- Labels are normal tasks with status `label`
+- Label tasks can be updated, have notes, descriptions, etc.
+- When a theme completes, mark the label as `done`
+- When a label is deprecated, mark it as `cancelled`
+- Use `task merge` to combine duplicate labels
+
+---
+
+### untag
+
+Remove a tag from a task.
+
+**Usage:**
+```bash
+task untag <id> <tag_name>
+```
+
+**Arguments:**
+- `id` (required) - Task ID to untag
+- `tag_name` (required) - Name of the tag/label to remove
+
+**Description:**
+Removes a tag from a task by removing the link to the label task. The label task itself is not deleted (other tasks may still reference it).
+
+**Examples:**
+```bash
+# Remove a tag
+task untag 42 security
+
+# The label task still exists
+task list --status label  # Still shows "security" label
+```
+
+**Output:**
+```
+Removed tag 'security' from task #42
+```
+
+---
+
+### merge
+
+Merge one task into another.
+
+**Usage:**
+```bash
+task merge <source_id> <target_id>
+```
+
+**Arguments:**
+- `source_id` (required) - ID of task to merge from
+- `target_id` (required) - ID of task to merge into
+
+**Description:**
+Merges a source task into a target task. This is useful for:
+- Combining duplicate labels (e.g., "secuirty" typo → "security")
+- Consolidating duplicate tasks
+- Cleaning up organizational tasks
+
+The merge operation:
+1. Updates all tasks that link to source to link to target instead
+2. Copies source's links to target (if not already present)
+3. Copies source's notes to target
+4. Marks source as `cancelled` with a note indicating it was merged
+5. Reports how many tasks were updated
+
+**Examples:**
+```bash
+# Merge duplicate labels
+task merge 101 100  # Merge "secuirty" into "security"
+
+# Merge duplicate work tasks
+task merge 55 54  # Consolidate duplicate tasks
+```
+
+**Output:**
+```
+Merged task #101 into #100
+Updated 3 task(s) that referenced #101
+Source task #101 marked as cancelled
+```
+
+**Notes:**
+- Source and target cannot be the same task
+- Source task is marked `cancelled`, not deleted (preserves history)
+- All references are updated atomically
+- Notes and links are preserved
 
 ---
 

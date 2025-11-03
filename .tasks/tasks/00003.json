@@ -1,11 +1,17 @@
 {
   "id": 3,
   "created": "2025-11-03T10:40:56.8320523+01:00",
-  "updated": "2025-11-03T10:40:56.8320523+01:00",
+  "updated": "2025-11-03T18:14:26.1856653+01:00",
   "status": "backlog",
   "title": "Third task",
   "description": "",
   "notes": [],
+  "links": [
+    {
+      "target_id": 7,
+      "type": "child"
+    }
+  ],
   "dependencies": [],
   "tags": []
 }
