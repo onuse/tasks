@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "created": "2025-11-03T10:40:56.8320523+01:00",
+  "updated": "2025-11-03T10:40:56.8320523+01:00",
+  "status": "backlog",
+  "title": "Third task",
+  "description": "",
+  "notes": [],
+  "dependencies": [],
+  "tags": []
+}

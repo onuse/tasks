@@ -1,0 +1,18 @@
+{
+  "id": 2,
+  "created": "2025-11-03T10:40:53.8298049+01:00",
+  "updated": "2025-11-03T13:18:58.5407058+01:00",
+  "status": "backlog",
+  "title": "Second task",
+  "description": "Another task to test",
+  "notes": [],
+  "links": [
+    {
+      "target_id": 3,
+      "type": "parent",
+      "label": "Main feature"
+    }
+  ],
+  "dependencies": [],
+  "tags": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": 5,
+  "created": "2025-11-03T13:18:05.4534817+01:00",
+  "updated": "2025-11-03T13:18:31.6923693+01:00",
+  "status": "blocked",
+  "title": "Dependent task",
+  "description": "Depends on foundation",
+  "notes": [],
+  "links": [
+    {
+      "target_id": 4,
+      "type": "blocked_by"
+    }
+  ],
+  "dependencies": [],
+  "tags": []
+}

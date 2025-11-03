@@ -1,0 +1,17 @@
+{
+  "id": 1,
+  "created": "2025-11-03T10:40:51.2565871+01:00",
+  "updated": "2025-11-03T10:41:58.854949+01:00",
+  "status": "done",
+  "title": "First task",
+  "description": "This is my first task",
+  "notes": [
+    {
+      "timestamp": "2025-11-03T10:41:37.3291438+01:00",
+      "author": "human",
+      "text": "Started working on this task"
+    }
+  ],
+  "dependencies": [],
+  "tags": []
+}
