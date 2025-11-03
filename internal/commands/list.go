@@ -14,7 +14,7 @@ import (
 func List(args []string) error {
 	// Parse flags
 	fs := flag.NewFlagSet("list", flag.ExitOnError)
-	statusFlag := fs.String("status", "active", "Filter by status (backlog, active, blocked, done, cancelled, all)")
+	statusFlag := fs.String("status", "active", "Filter by status (backlog, next, active, blocked, done, cancelled, all)")
 	formatFlag := fs.String("format", "text", "Output format (text, json, compact)")
 	sortFlag := fs.String("sort", "id", "Sort by: id, created, updated, title, status")
 	reverseFlag := fs.Bool("reverse", false, "Reverse sort order")
@@ -23,7 +23,7 @@ func List(args []string) error {
 	// Validate status
 	filterStatus := *statusFlag
 	if filterStatus != "all" && !task.IsValidStatus(filterStatus) {
-		return fmt.Errorf("invalid status '%s' (must be: backlog, active, blocked, done, cancelled, all)", filterStatus)
+		return fmt.Errorf("invalid status '%s' (must be: backlog, next, active, blocked, done, cancelled, all)", filterStatus)
 	}
 
 	// Find task root

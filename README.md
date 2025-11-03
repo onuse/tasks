@@ -55,6 +55,7 @@ task list --status all
 
 # List by status
 task list --status backlog
+task list --status next
 task list --status blocked
 task list --status done
 
@@ -164,13 +165,16 @@ task context --format json
 
 ## Task Statuses
 
-- `backlog` - Not started (default for new tasks)
+- `backlog` - Not started, future work (default for new tasks)
+- `next` - Prioritized and ready to work on
 - `active` - Currently being worked on
 - `blocked` - Waiting on dependencies or external factors
 - `done` - Completed
 - `cancelled` - Won't do
 
 All status transitions are allowed - you can move tasks between any statuses freely.
+
+The typical workflow is: `backlog` → `next` → `active` → `done`
 
 ## Output Formats
 

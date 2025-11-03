@@ -204,6 +204,7 @@ const htmlTemplate = `<!DOCTYPE html>
         }
 
         .status-backlog { border-left: 4px solid #9e9e9e; }
+        .status-next { border-left: 4px solid #FFC107; }
         .status-active { border-left: 4px solid #2196F3; }
         .status-blocked { border-left: 4px solid #ff9800; }
         .status-done { border-left: 4px solid #4caf50; }
@@ -428,6 +429,7 @@ const htmlTemplate = `<!DOCTYPE html>
         }
 
         .list-task-status.backlog { background: #9e9e9e; color: white; }
+        .list-task-status.next { background: #FFC107; color: white; }
         .list-task-status.active { background: #2196F3; color: white; }
         .list-task-status.blocked { background: #ff9800; color: white; }
         .list-task-status.done { background: #4caf50; color: white; }
@@ -530,9 +532,10 @@ const htmlTemplate = `<!DOCTYPE html>
         }
 
         function renderBoard() {
-            const statuses = ['backlog', 'active', 'blocked', 'done', 'cancelled'];
+            const statuses = ['backlog', 'next', 'active', 'blocked', 'done', 'cancelled'];
             const statusNames = {
                 'backlog': 'Backlog',
+                'next': 'Next',
                 'active': 'Active',
                 'blocked': 'Blocked',
                 'done': 'Done',

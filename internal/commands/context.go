@@ -12,6 +12,7 @@ import (
 )
 
 type ContextOutput struct {
+	Next               []ContextTask `json:"next"`
 	Active             []ContextTask `json:"active"`
 	RecentlyCompleted  []ContextTask `json:"recently_completed"`
 	Summary            Summary       `json:"summary"`
@@ -25,6 +26,7 @@ type ContextTask struct {
 
 type Summary struct {
 	Total     int `json:"total"`
+	Next      int `json:"next"`
 	Active    int `json:"active"`
 	Backlog   int `json:"backlog"`
 	Done      int `json:"done"`
@@ -54,6 +56,7 @@ func Context(args []string) error {
 	}
 
 	// Organize tasks
+	var next []task.IndexEntry
 	var active []task.IndexEntry
 	var completed []task.IndexEntry
 	summary := Summary{}
@@ -62,6 +65,9 @@ func Context(args []string) error {
 		summary.Total++
 
 		switch entry.Status {
+		case task.StatusNext:
+			summary.Next++
+			next = append(next, entry)
 		case task.StatusActive:
 			summary.Active++
 			active = append(active, entry)
@@ -92,15 +98,23 @@ func Context(args []string) error {
 	// Output
 	switch *formatFlag {
 	case "json":
-		return outputContextJSON(active, recentCompleted, summary)
+		return outputContextJSON(next, active, recentCompleted, summary)
 	default:
-		return outputContextText(active, recentCompleted, summary)
+		return outputContextText(next, active, recentCompleted, summary)
 	}
 }
 
-func outputContextText(active, completed []task.IndexEntry, summary Summary) error {
+func outputContextText(next, active, completed []task.IndexEntry, summary Summary) error {
 	fmt.Println("PROJECT CONTEXT")
 	fmt.Println()
+
+	if len(next) > 0 {
+		fmt.Printf("Next Tasks (%d):\n", len(next))
+		for _, t := range next {
+			fmt.Printf("  #%-4d %s\n", t.ID, t.Title)
+		}
+		fmt.Println()
+	}
 
 	if len(active) > 0 {
 		fmt.Printf("Active Tasks (%d):\n", len(active))
@@ -108,7 +122,7 @@ func outputContextText(active, completed []task.IndexEntry, summary Summary) err
 			fmt.Printf("  #%-4d %s\n", t.ID, t.Title)
 		}
 		fmt.Println()
-	} else {
+	} else if len(next) == 0 {
 		fmt.Println("Active Tasks: None")
 		fmt.Println()
 	}
@@ -122,17 +136,25 @@ func outputContextText(active, completed []task.IndexEntry, summary Summary) err
 		fmt.Println()
 	}
 
-	fmt.Printf("Total: %d tasks (%d active, %d backlog, %d done, %d cancelled)\n",
-		summary.Total, summary.Active, summary.Backlog, summary.Done, summary.Cancelled)
+	fmt.Printf("Total: %d tasks (%d next, %d active, %d backlog, %d done, %d cancelled)\n",
+		summary.Total, summary.Next, summary.Active, summary.Backlog, summary.Done, summary.Cancelled)
 
 	return nil
 }
 
-func outputContextJSON(active, completed []task.IndexEntry, summary Summary) error {
+func outputContextJSON(next, active, completed []task.IndexEntry, summary Summary) error {
 	output := ContextOutput{
+		Next:              make([]ContextTask, len(next)),
 		Active:            make([]ContextTask, len(active)),
 		RecentlyCompleted: make([]ContextTask, len(completed)),
 		Summary:           summary,
+	}
+
+	for i, t := range next {
+		output.Next[i] = ContextTask{
+			ID:    t.ID,
+			Title: t.Title,
+		}
 	}
 
 	for i, t := range active {

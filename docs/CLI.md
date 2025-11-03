@@ -101,7 +101,7 @@ task list [--status STATUS] [--sort FIELD] [--reverse] [--format FORMAT]
 
 **Options:**
 - `--status` - Filter by status (default: `active`)
-  - Values: `backlog`, `active`, `blocked`, `done`, `cancelled`, `all`
+  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`, `all`
 - `--sort` - Sort tasks by field (default: `id`)
   - Values: `id`, `created`, `updated`, `title`, `status`
 - `--reverse` - Reverse sort order
@@ -205,7 +205,7 @@ task update <id> [--status STATUS] [--title TITLE] [--description DESC] [--note 
 
 **Options:**
 - `--status` - Change task status
-  - Values: `backlog`, `active`, `blocked`, `done`, `cancelled`
+  - Values: `backlog`, `next`, `active`, `blocked`, `done`, `cancelled`
 - `--title` - Update task title
 - `--description` - Update task description
 - `--note` - Add a timestamped note
@@ -401,7 +401,8 @@ task context [--format FORMAT]
 
 **Description:**
 Provides a compact overview of the project's task status, designed to be included in LLM prompts after context compaction. Shows:
-- Active tasks
+- Next tasks (prioritized, ready to work on)
+- Active tasks (currently being worked on)
 - Recently completed tasks (last 7 days, up to 5 most recent)
 - Summary statistics
 
@@ -418,16 +419,18 @@ task context --format json
 ```
 PROJECT CONTEXT
 
-Active Tasks (3):
+Next Tasks (2):
   #42   Implement authentication
   #43   Add rate limiting
+
+Active Tasks (1):
   #44   Update documentation
 
 Recently Completed (2):
   #40   Fix login bug (completed 2025-11-02)
   #41   Add logging (completed 2025-11-02)
 
-Total: 15 tasks (3 active, 8 backlog, 4 done, 0 cancelled)
+Total: 15 tasks (2 next, 1 active, 8 backlog, 4 done, 0 cancelled)
 ```
 
 ---
@@ -447,7 +450,7 @@ task serve [--port PORT] [--no-browser]
 
 **Description:**
 Starts a local HTTP server serving the web UI. Features include:
-- **Board View**: Kanban board with columns for each status
+- **Board View**: Kanban board with columns for each status (backlog, next, active, blocked, done, cancelled)
 - **List View**: Compact list of all tasks
 - **Search**: Real-time filtering as you type
 - **Task Details**: Click any task to see full information

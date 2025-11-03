@@ -9,6 +9,7 @@ type Status string
 
 const (
 	StatusBacklog   Status = "backlog"
+	StatusNext      Status = "next"
 	StatusActive    Status = "active"
 	StatusBlocked   Status = "blocked"
 	StatusDone      Status = "done"
@@ -17,7 +18,7 @@ const (
 
 // ValidStatuses returns all valid status values
 func ValidStatuses() []Status {
-	return []Status{StatusBacklog, StatusActive, StatusBlocked, StatusDone, StatusCancelled}
+	return []Status{StatusBacklog, StatusNext, StatusActive, StatusBlocked, StatusDone, StatusCancelled}
 }
 
 // IsValidStatus checks if a status string is valid

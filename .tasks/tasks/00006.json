@@ -1,0 +1,12 @@
+{
+  "id": 6,
+  "created": "2025-11-03T14:38:31.2982909+01:00",
+  "updated": "2025-11-03T14:38:42.0899466+01:00",
+  "status": "next",
+  "title": "Test next status",
+  "description": "Testing the new 'next' status priority queue",
+  "notes": [],
+  "links": [],
+  "dependencies": [],
+  "tags": []
+}
